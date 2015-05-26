@@ -12,6 +12,9 @@ where `file_list` can be:
 3. Array of file names (predefined list),
 4. String row of file names.
 
+
+You can download the repo and open `index.html` file to see usage example in the wild.
+
 Explanation
 --
 1) `file_list`: '/api/config' or, with parameters,
