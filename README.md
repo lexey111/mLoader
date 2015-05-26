@@ -7,6 +7,7 @@ Usage
       mLoader.load(<file_list>, <loader_options>);
 
 where `file_list` can be:
+
 1. Remote server url as string (HTTP POST request without parameters),
 2. Remote server url as object (HTTP POST request with parameters),
 3. Array of file names (predefined list),
