@@ -2,16 +2,15 @@ mLoader
 ==
 A little JS library to asynchronous loading of JS and CSS. Based on Promises.
 
- Usage
- --
- 
-     mLoader.load(<file_list>, <loader_options>);
+Usage
+--
+      mLoader.load(<file_list>, <loader_options>);
 
-`file_list` can be:
+where `file_list` can be:
 1. Remote server url as string (HTTP POST request without parameters),
 2. Remote server url as object (HTTP POST request with parameters),
 3. Array of file names (predefined list),
-4. String of file names.
+4. String row of file names.
 
 Explanation
 --
@@ -49,8 +48,8 @@ and the loading sequence will be:
  		
 (semicolon separates sequential file section, comma - parallel)
 
- 		Notice: If <file_list> is string WITHOUT commas and semicolons, it will be treated as config_url. (1)
- 		If <file_list> is string WITH commas and/or semicolons, it will be treated as comma-separated list of files to load. (4)
+*Notice:* If <file_list> is string WITHOUT commas and semicolons, it will be treated as config_url. (1)
+If <file_list> is string WITH commas and/or semicolons, it will be treated as comma-separated list of files to load. (4)
 
 `loader_options` is, surprisigly, optional object
 		
