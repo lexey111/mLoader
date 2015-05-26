@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Test HTML File</title>
+		<style type="text/css">
+			body{
+				margin: 2em;
+			}
+			#progress{
+				display: block;
+				position: relative;
+				font-size: 1em;
+				float: none;
+				width: 20em;
+				background-color: #D2E7EE;
+				height: 1.5em;
+				margin: 0;
+				overflow: hidden;
+			}
+			#progressbar{
+				display: block;
+				position: absolute;
+				top: 0;
+				left: 0;
+				bottom: 0;
+				height: 100%;
+				width: 0;
+				background-color: #4477BD;
+				color: #fff;
+				overflow: hidden;
+				transition: width .5s;
+			}
+			#final{
+				opacity: 0;
+				transition: opacity 1s;
+			}
+			#final span {
+				font-weight: bold;
+			}
+			#total_blind{
+				position: fixed;
+				top: 0;
+				left: 0;
+				right:0;
+				bottom: 0;
+				z-index: 1000;
+				background-color: #fff;
+				opacity: .8;
+				text-align: center;
+				display: none;
+			}
+			#total_blind span{
+				width: 20em;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-left: -10em;
+				margin-top: -.5em;
+				font-size: 1em;
+				text-transform: uppercase;
+			}
+			.error{
+				color: #C35700;
+				font-weight: bold;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="jumbotron">
+				<h1>Test application</h1>
+				<h3></h3>
+				<div id="load-indicator">
+					<div id="loading">Please wait...</div>
+					<div id="progress" class="progress progress-striped"><div id="progressbar" class="progress-bar progress-bar-info"></div></div>
+				</div>
+			</div>
+			<p class="muted-text">
+				If you see any error during loading, please refresh the page.
+			</p>
+			<div><ol id="stat"></ol></div>
+			<div id="final" class="panel panel-primary">
+				<div class="panel-heading">Done</div>
+				<div class="panel-body">
+					All <span></span> data in <span></span> files has been loaded.
+					<p>
+						You can switch theme by clicking button below:
+					</p>
+					<button class="btn btn-primary" onclick="loadRandomTheme();">Load other theme</button>
+				</div>
+			</div>
+		</div>
+		<footer class="footer">
+      		<div class="container">
+        		<p class="copy">&copy; <a target="_blank" href="http://lexey111.com">lexey111</a>, 2015</p>
+        		<div class="row">
+        			<div class="col-md-4">
+		        		<p>Used as example payload:</p>
+        			</div>
+	        		<ul class="col-md-4">
+	        			<li><a href="http://getbootstrap.com/" target="_blank">Bootstrap</a></li>
+	        			<li><a href="http://bootswatch.com/" target="_blank">Bootswatch</a></li>
+	        			<li><a href="https://jquery.com/" target="_blank">jQuery</a></li>
+	        		</ul>
+	        		<ul class="col-md-4">
+	        			<li><a href="https://github.com/scottjehl/Respond" target="_blank">RespondJS</a></li>
+	        			<li><a href="https://github.com/afarkas/html5shiv" target="_blank">The HTML5 Shiv</a></li>
+	        		</ul>
+        		</div>
+      		</div>
+    	</footer>
+
+		<div id="total_blind"><span>Please wait</span></div>
+
+		<!-- example code -->
+
+		<script type="text/javascript">
+			var loaded_bytes = 0;
+			var total_counter = 0;
+			var load_counter = 0;
+
+			var themes = ['superhero', 'sandstone', 'slate', 'paper', 'cerulean', 'united', 'cyborg'];
+			var current_theme_index = 0;
+
+			var theme_name = document.getElementsByTagName('h3')[0];
+			theme_name.innerHTML = 'Theme: ' + themes[current_theme_index];
+
+			var load_indicator = document.getElementById('load-indicator');
+			var progressbar = document.getElementById('progressbar');
+			var loading = document.getElementById('loading');
+			var stat = document.getElementById('stat');
+			
+			var total_blind = document.getElementById('total_blind');
+
+			function _hideAll(){
+				total_blind.style.display = 'block';
+			}
+
+			function _showAll(){
+				total_blind.style.opacity = 1;
+				(function fadeBlind(){(total_blind.style.opacity-=.1)<0?total_blind.style.display="none":setTimeout(fadeBlind, 40)})();
+			}
+
+			function onStart(queue, count){
+				total_counter += count;
+			}
+
+			function onProgress(filename, len){
+				loaded_bytes += len;
+				load_counter++;
+
+				loading.innerHTML = 'Bytes loaded: ' + loaded_bytes + ', file ' + load_counter + ' from ' + total_counter;
+				stat.innerHTML += '<li>' + filename +', length: ' + formatBytes(len) + '</li>';
+
+				var loading_progress = Math.round((load_counter / total_counter) * 100);
+				progressbar.style.width = loading_progress + '%';
+			}
+
+			function onFinish(loaded_modules){
+				load_indicator.style.opacity = 1;
+				(function fade(){(load_indicator.style.opacity-=.1)<0?load_indicator.style.display="none":setTimeout(fade, 120)})();
+
+				var final_div = document.getElementById('final');
+				var spans = final_div.getElementsByTagName('span');
+
+				spans[0].innerHTML = formatBytes(loaded_bytes) + ' (' + loaded_bytes+ ')';
+				spans[1].innerHTML = load_counter;
+
+				final_div.style.opacity = 1;
+
+				var theme_url = 'https://bootswatch.com/' + themes[current_theme_index];
+				theme_name.innerHTML = 'Theme: ' + themes[current_theme_index] + '<p>' + 
+					'<a target="_blank" href="' + theme_url +'">' + theme_url + '</a>';
+
+				_showAll();
+			}
+
+			function onError(err){
+				stat.innerHTML += '<li class="error">Error: ' + err + '</li>';
+				_showAll();
+				alert(err);
+			}
+
+			function formatBytes(bytes, decimals) {
+				if(bytes == 0) return '0 Byte';
+				var k = 1000;
+				var dm = decimals + 1 || 3;
+				var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+				var i = Math.floor(Math.log(bytes) / Math.log(k));
+				return (bytes / Math.pow(k, i)).toPrecision(dm) + ' ' + sizes[i];
+			}
+
+			var initial_files = [
+							'http://code.jquery.com/jquery-1.11.3.js', 
+							[
+								'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js',
+								'http://code.jquery.com/ui/1.11.3/jquery-ui.js',
+								'https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js',
+								'https://oss.maxcdn.com/respond/1.4.2/respond.min.js'
+							],
+							'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css',
+							'http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css',
+							'https://bootswatch.com/' + themes[current_theme_index] + '/bootstrap.min.css'
+					];
+
+
+			// Vanilla: collect all elements by attribute
+			function findElementsByAttributeValue(attribute, value) {
+				var All = document.getElementsByTagName('*');
+				var result = [];
+				for (var i = 0; i < All.length; i++) {
+					if (All[i].getAttribute(attribute) == value) { 
+						result.push(All[i]); 
+					}
+				}
+				return result;
+			}
+
+			// Vanilla: detach all stylesheets
+			function clearAllStylesheets(exception_list){
+				var stylesheets = findElementsByAttributeValue('rel', 'stylesheet');
+				var i;
+				var has_to_be_removed = false;
+				for(i in stylesheets) {
+				    var sheet = stylesheets[i];
+				    if (sheet.parentNode){
+				    	var s = sheet.getAttribute('data-origin');
+
+				    	// remove all except items that matched patterns in [exception_list]
+				    	has_to_be_removed = true;
+				    	if (s && exception_list){
+			   	 			exception_list.every(function(item){
+			   	 				if (s.indexOf(item) !== -1){
+			   	 					has_to_be_removed = false;
+			   	 					return false;
+			   	 				}
+			   	 				return true;
+			   	 			});
+				   	 	}
+
+				   	 	if (has_to_be_removed){
+			    			sheet.parentNode.removeChild(sheet);
+			    		}
+				    }
+				}
+
+			}
+
+			function loadRandomTheme(){
+				var i = current_theme_index;
+				while (i == current_theme_index){
+					current_theme_index = Math.floor(Math.random() * themes.length);
+				}
+				_hideAll();
+				
+				clearAllStylesheets(['jumbotron-narrow']);
+				var theme_url = 'https://bootswatch.com/' + themes[current_theme_index] + '/bootstrap.min.css';
+				theme_name.innerHTML = 'Loading ' + themes[current_theme_index] + ', please wait...';
+
+				mLoader.load(
+					[theme_url], 
+					{
+						finish: onFinish,
+						start: onStart,
+						progress: onProgress,
+						fail: function(err){
+							stat.innerHTML += '<li class="error">Error: ' + err + '</li>';
+							current_theme_index = i;
+							theme_name.innerHTML = 'Theme: ' + themes[current_theme_index];
+
+							_showAll();
+							alert('Network error occured during the loading theme: ' + err + '\n\n' + 'Please, click button again to reload.');
+						}
+					});
+			}
+		</script>
+
+		<script src="js/mloader.min.js" onload="mLoader.load(initial_files, {delay: 1200, start: onStart, finish: onFinish, progress: onProgress, fail: onError});" defer="true"></script>
+
+	</body>
+</html>
