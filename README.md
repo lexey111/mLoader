@@ -83,9 +83,10 @@ File name without path separators will be expanded as %loader_options.folder% + 
 mLoader supports .js (default) and .css files to load.
 
 
- Examples
- --
-	 1. <script src="js/mloader.js" onload="mLoader.load('/api/config', {timeout: 2000});" defer="true"></script>
+Examples
+--
+ 
+	 1. (HTML) <script src="js/mloader.js" onload="mLoader.load('/api/config', {timeout: 2000});" defer="true"></script>
 
 	 2. mLoader.load(); // error, unknown provider
 
